@@ -1,0 +1,24 @@
+syntax = "proto3";
+package room;
+//  Room 会生成 Room 命名的结构体
+message Room {
+    int32 id = 1;
+    string name = 2;
+}
+//  RoomInfo 会生成 RoomInfo 命名的结构体
+message RoomInfo {
+    string name = 1;
+}
+//  RoomReq 会生成 RoomReq 命名的结构体
+message RoomReq {
+    string name = 1;
+}
+//  RoomRsp 会生成 RoomRsp 命名的结构体
+message RoomRsp {
+    string name = 1;
+}
+// The PushStream service definition.
+service PushStream {
+    // push stream
+    rpc PushStream (stream RoomInfo) returns (stream RoomInfo) {}
+}

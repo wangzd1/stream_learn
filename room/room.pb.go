@@ -201,8 +201,66 @@ func init() {
 
 func init() { proto.RegisterFile("room.proto", fileDescriptor_c5fd27dd97284ef4) }
 
-type ReceiveClient interface {
-	PushStream(ctx context.Context, in *RoomReq, opts ...grpc.CallOption) (*RoomRsp, error)
+// client
+type StreamClient interface {
+	SayHello(ctx context.Context, in *RoomReq, opts ...grpc.CallOption) (*RoomRsp, error)
+}
+
+type streamClient struct {
+	cc *grpc.ClientConn
+}
+
+func NewStreamClient(cc *grpc.ClientConn) StreamClient {
+	return &streamClient{cc}
+}
+
+func (c *streamClient) SayHello(ctx context.Context, in *RoomReq, opts ...grpc.CallOption) (*RoomRsp, error) {
+	out := new(RoomRsp)
+	err := c.cc.Invoke(ctx, "/streamSERVER/SayHello", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// server
+type StreamServer interface {
+	SayHello(ctx context.Context, in *RoomReq) (*RoomRsp, error)
+}
+
+func RegisterStreamServer(s *grpc.Server, srv StreamServer) {
+	s.RegisterService(&_Stream_serviceDesc, srv)
+}
+
+var _Stream_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "streamSERVER",
+	HandlerType: (*StreamServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "SayHello",
+			Handler:    _StreamService_SayHello_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "room.proto",
+}
+
+func _StreamService_SayHello_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RoomReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StreamServer).SayHello(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/streamSERVER/SayHello",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StreamServer).SayHello(ctx, req.(*RoomReq))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 var fileDescriptor_c5fd27dd97284ef4 = []byte{

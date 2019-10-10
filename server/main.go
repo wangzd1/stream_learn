@@ -5,8 +5,9 @@ import (
 	"log"
 	"net"
 
+	pb "stream_learn/room"
+
 	"google.golang.org/grpc"
-	pb "google.golang.org/grpc/examples/helloworld/helloworld"
 )
 
 const (
@@ -14,12 +15,12 @@ const (
 )
 
 // server is used to implement helloworld.GreeterServer.
-type server struct{}
+type streamServer struct{}
 
 // SayHello implements helloworld.GreeterServer
-func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
+func (s *streamServer) SayHello(ctx context.Context, in *pb.RoomReq) (*pb.RoomRsp, error) {
 	log.Printf("Received: %v", in.Name)
-	return &pb.HelloReply{Message: "Hello " + in.Name}, nil
+	return &pb.RoomRsp{Name: "Server name "}, nil
 }
 
 func main() {
@@ -28,7 +29,7 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	pb.RegisterGreeterServer(s, &server{})
+	pb.RegisterStreamServer(s, &streamServer{})
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

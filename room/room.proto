@@ -18,7 +18,7 @@ message RoomRsp {
     string name = 1;
 }
 // The PushStream service definition.
-service PushStream {
+service SayHello {
     // push stream
-    rpc PushStream (stream RoomInfo) returns (stream RoomInfo) {}
+    rpc SayHello (stream RoomInfo) returns (stream RoomInfo) {}
 }

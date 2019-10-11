@@ -7,6 +7,8 @@ import (
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
 	math "math"
+	"context"
+	"google.golang.org/grpc"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -99,21 +101,116 @@ func (m *StreamResponse) GetName() string {
 }
 
 func init() {
-	proto.RegisterType((*StreamRequest)(nil), "proto.StreamRequest")
-	proto.RegisterType((*StreamResponse)(nil), "proto.StreamResponse")
+	proto.RegisterType((*StreamRequest)(nil), "proto.streamRequest")
+	proto.RegisterType((*StreamResponse)(nil), "proto.streamResponse")
 }
 
 func init() { proto.RegisterFile("origin_service.proto", fileDescriptor_4a78a6e360964aa4) }
 
 var fileDescriptor_4a78a6e360964aa4 = []byte{
-	// 132 bytes of a gzipped FileDescriptorProto
+	// 136 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0xc9, 0x2f, 0xca, 0x4c,
 	0xcf, 0xcc, 0x8b, 0x2f, 0x4e, 0x2d, 0x2a, 0xcb, 0x4c, 0x4e, 0xd5, 0x2b, 0x28, 0xca, 0x2f, 0xc9,
-	0x17, 0x62, 0x05, 0x53, 0x4a, 0xca, 0x5c, 0xbc, 0xc1, 0x25, 0x45, 0xa9, 0x89, 0xb9, 0x41, 0xa9,
+	0x17, 0x62, 0x05, 0x53, 0x4a, 0xca, 0x5c, 0xbc, 0xc5, 0x25, 0x45, 0xa9, 0x89, 0xb9, 0x41, 0xa9,
 	0x85, 0xa5, 0xa9, 0xc5, 0x25, 0x42, 0x42, 0x5c, 0x2c, 0x79, 0x89, 0xb9, 0xa9, 0x12, 0x8c, 0x0a,
 	0x8c, 0x1a, 0x9c, 0x41, 0x60, 0xb6, 0x92, 0x0a, 0x17, 0x1f, 0x4c, 0x51, 0x71, 0x41, 0x7e, 0x5e,
-	0x71, 0x2a, 0x36, 0x55, 0x46, 0x5e, 0x30, 0xa3, 0x82, 0x21, 0x16, 0x09, 0x59, 0x72, 0x71, 0x40,
-	0x99, 0x86, 0x42, 0x22, 0x10, 0x6b, 0xf5, 0x50, 0x2c, 0x93, 0x12, 0x45, 0x13, 0x85, 0x98, 0xae,
-	0xc4, 0x90, 0xc4, 0x06, 0x16, 0x37, 0x06, 0x04, 0x00, 0x00, 0xff, 0xff, 0x1b, 0x53, 0x1b, 0x9f,
-	0xbc, 0x00, 0x00, 0x00,
+	0x71, 0x2a, 0x36, 0x55, 0x46, 0x1e, 0x5c, 0x9c, 0xbe, 0x95, 0xc1, 0x10, 0x4b, 0x84, 0xac, 0xb9,
+	0x38, 0xa0, 0x4c, 0x43, 0x21, 0x11, 0x88, 0x95, 0x7a, 0x28, 0x16, 0x49, 0x89, 0xa2, 0x89, 0x42,
+	0x4c, 0x56, 0x62, 0xd0, 0x60, 0x4c, 0x62, 0x03, 0xcb, 0x18, 0x03, 0x02, 0x00, 0x00, 0xff, 0xff,
+	0x52, 0x80, 0x7f, 0x4f, 0xba, 0x00, 0x00, 0x00,
+}
+
+type StreamServiceClient interface {
+	Service1(ctx context.Context, opts ...grpc.CallOption) (StreamClient, error)
+}
+
+type streamServiceClient struct {
+	cc *grpc.ClientConn
+}
+
+func NewStreamServiceClient(cc *grpc.ClientConn) StreamServiceClient {
+	return &streamServiceClient{cc}
+}
+
+func (c *streamServiceClient) Service1(ctx context.Context, opts ...grpc.CallOption) (StreamClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_StreamService_serviceDesc.Streams[0], "/proto.MyService/Service1", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &streamClient{stream}
+	return x, nil
+}
+
+type StreamClient interface {
+	Send(*StreamRequest) error
+	CloseAndRecv() (*StreamResponse, error)
+	grpc.ClientStream
+}
+
+type streamClient struct {
+	grpc.ClientStream
+}
+
+func (x *streamClient) Send(m *StreamRequest) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *streamClient) CloseAndRecv() (*StreamResponse, error) {
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	m := new(StreamResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func RegisterStreamServiceServer(s *grpc.Server, srv StreamServiceServer) {
+	s.RegisterService(&_StreamService_serviceDesc, srv)
+}
+
+var _StreamService_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "proto.MyService",
+	HandlerType: (*StreamServiceServer)(nil),
+	Methods:     []grpc.MethodDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "Service1",
+			Handler:       _MyService_Service1_Handler,
+			ClientStreams: true,
+		},
+	},
+	Metadata: "origin_service.proto",
+}
+
+func _MyService_Service1_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(StreamServiceServer).Service1(&streamServiceRecordServer{stream})
+}
+
+
+type StreamServiceServer interface {
+	Service1(StreamService_RecordServer) error
+}
+
+type StreamService_RecordServer interface {
+	SendAndClose(*StreamResponse) error
+	Recv() (*StreamRequest, error)
+	grpc.ServerStream
+}
+
+type streamServiceRecordServer struct {
+	grpc.ServerStream
+}
+
+func (x *streamServiceRecordServer) SendAndClose(m *StreamResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *streamServiceRecordServer) Recv() (*StreamRequest, error) {
+	m := new(StreamRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }

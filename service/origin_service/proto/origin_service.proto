@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package proto;
+
+service StreamService {
+    rpc Service1(StreamRequest) returns (StreamResponse) {};
+}
+
+message StreamRequest {
+  string name = 1;
+}
+
+message StreamResponse {
+  string name = 1;
+}

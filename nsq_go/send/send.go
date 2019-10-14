@@ -14,7 +14,6 @@ var producer *nsq.Producer
 // 主函数
 func main() {
 	strIP1 := "127.0.0.1:4150"
-	strIP2 := "127.0.0.1:4152"
 	InitProducer(strIP1)
 
 	running := true
@@ -30,7 +29,6 @@ func main() {
 
 		for err := Publish("test", command); err != nil; err = Publish("test", command) {
 			//切换IP重连
-			strIP1, strIP2 = strIP2, strIP1
 			InitProducer(strIP1)
 		}
 	}

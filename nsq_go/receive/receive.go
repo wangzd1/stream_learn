@@ -3,6 +3,7 @@ package main
 
 import (
 	"fmt"
+
 	"time"
 
 	"github.com/nsqio/go-nsq"
@@ -13,7 +14,7 @@ type ConsumerT struct{}
 
 // 主函数
 func main() {
-	InitConsumer("test", "test-channel", "127.0.0.1:4161")
+	InitConsumer("test", "test-channel", "127.0.0.1:4150")
 	for {
 		time.Sleep(time.Second * 10)
 	}
@@ -36,14 +37,14 @@ func InitConsumer(topic string, channel string, address string) {
 	c.SetLogger(nil, 0)        //屏蔽系统日志
 	c.AddHandler(&ConsumerT{}) // 添加消费者接口
 
-	//建立NSQLookupd连接
-	if err := c.ConnectToNSQLookupd(address); err != nil {
+	//建立ConnectToNSQD连接
+	if err := c.ConnectToNSQD(address); err != nil {
 		panic(err)
 	}
 
-	// // 建立多个nsqd连接
-	// if err := c.ConnectToNSQDs([]string{"127.0.0.1:4161", "127.0.0.1:4162"}); err != nil {
-	// 	panic(err)
+	//建立多个nsqd连接
+	// if err := c.ConnectToNSQDs([]string{"127.0.0.1:4150", "127.0.0.1:4152"}); err != nil {
+	//  panic(err)
 	// }
 
 	// 建立一个nsqd连接

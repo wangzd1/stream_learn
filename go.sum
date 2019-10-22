@@ -4,6 +4,8 @@ github.com/EDDYCJY/go-grpc-example v0.0.0-20181014074047-0f68708edbcb h1:0yN9vJx
 github.com/EDDYCJY/go-grpc-example v0.0.0-20181014074047-0f68708edbcb/go.mod h1:fDCw1s1ryJOjsZb8+eAaMfFio1y9G9Hi+rgYVIVUXsw=
 github.com/FFmpeg/FFmpeg v0.6.1 h1:i0ryMHDG6M+etoA8XEqX+YAQdE/k47WhX2y1GwYPpYA=
 github.com/FFmpeg/FFmpeg v0.6.1/go.mod h1:XVPzxO1cC3pLl3dtf7rfJZsl6NC/QrnxiMFFeoXvpM8=
+github.com/TarsCloud/TarsGo v0.0.0-20190926095202-2c6dd1e2f41a h1:BLs8BJryLJ3bzoqOC4Pyby1cT3XyJfYqQ2P44KqV/c8=
+github.com/TarsCloud/TarsGo v0.0.0-20190926095202-2c6dd1e2f41a/go.mod h1:ybmr1NnX41dauJftSX4BwnVAoA0UpE4PeyjMpPKIdzY=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 github.com/giorgisio/goav v0.1.0 h1:ZyfG3NfX7PMSimv4ulhmnQJf/XeHpMdGCn+afRmY5Oc=
 github.com/giorgisio/goav v0.1.0/go.mod h1:RtH8HyxLRLU1iY0pjfhWBKRhnbsnmfoI+FxMwb5bfEo=

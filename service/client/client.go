@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"log"
+	"os"
 	"strconv"
 
 	"fmt"
@@ -20,10 +22,10 @@ const (
 
 func main() {
 	ch := make(chan int, 10)
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 1; i++ {
 		go clients(i, ch)
 	}
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 1; i++ {
 		fmt.Println(<-ch)
 	}
 	defer close(ch)
@@ -42,12 +44,16 @@ func clients(index int, ch chan int) {
 	if err != nil {
 		log.Fatalf("err1", err)
 	}
-
-	for n := 0; n < 3; n++ {
-		err := stream.Send(&pb.StreamRequest{Name: "request" + strconv.Itoa(index)})
+	i := 0
+	for {
+		input := bufio.NewReader(os.Stdin)
+		inputstring, _, _ := input.ReadLine()
+		err := stream.Send(&pb.StreamRequest{Name: "request" + strconv.Itoa(i) + string(inputstring)})
+		// time.Sleep(time.Second * 3)
 		if err != nil {
 			log.Fatalf("err2", err)
 		}
+		i++
 	}
 
 	resp, err := stream.CloseAndRecv()

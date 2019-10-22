@@ -1,0 +1,69 @@
+kubeadm join 192.168.10.142:6443 --token 2fzkcf.yj75t7z712qrnrs8 \
+    --discovery-token-ca-cert-hash sha256:10f39c6fdc4fbae240a01a8173506b1b7bc251632f19a2801918b03cd85dfca2
+
+
+
+
+
+
+
+
+
+
+------------------
+sudo kubeadm init --kubernetes-version v1.16.0 --image-repository registry.aliyuncs.com/google_containers --pod-network-cidr=192.168.0.0/16
+
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+kubectl apply -f https://docs.projectcalico.org/v3.10/manifests/calico.yaml
+-------------------
+
+sudo kubectl get pod --all-namespaces
+
+查看pod详情
+kubectl -n kube-system describe pod coredns-58cc8c89f4-t24nw
+
+查看pod日志
+kubectl -n kube-system logs -f coredns-58cc8c89f4-t24nw
+
+关闭systemd-resolvd服务
+sudo systemctl stop systemd-resolved
+sudo systemctl disable systemd-resolved
+
+calico网络组件
+kubectl apply -f https://docs.projectcalico.org/v3.10/manifests/calico.yaml
+
+
+kubectl taint nodes --all node-role.kubernetes.io/master-
+
+
+kubeadm init 后master一直处于notready状态
+https://blog.csdn.net/wangmiaoyan/article/details/101216496  (解决)
+
+CrashLoopBackOff：
+/etc/resolv.conf
+systemctl restart networking
+
+
+systemctl daemon-reload && systemctl restart kubelet
+
+禁用虚拟内存
+sudo swapoff -a
+
+systemctl daemon-reload
+systemctl restart kubelet
+iptables -F && iptables -t nat -F && iptables -t mangle -F && iptables -X  # will reset iptables
+
+
+Kubernetes- error uploading crisocket: timed out waiting for the condition:
+https://stackoverflow.com/questions/53525975/kubernetes-error-uploading-crisocket-timed-out-waiting-for-the-condition
+
+教程：
+https://www.cnblogs.com/yhaing/p/8568234.html
+
+
+测试集群：
+master上
+kubectl run tomcat001 --image=tomcat:7.0.82-jre7 --replicas=2 --port=8080

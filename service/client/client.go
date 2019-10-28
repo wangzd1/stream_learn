@@ -1,13 +1,12 @@
 package main
 
 import (
-	"bufio"
 	"context"
+	"fmt"
+	"io"
 	"log"
-	"os"
 	"strconv"
 
-	"fmt"
 	// "time"
 
 	pb "stream_learn/service/proto"
@@ -21,45 +20,87 @@ const (
 )
 
 func main() {
-	ch := make(chan int, 10)
-	for i := 0; i < 1; i++ {
-		go clients(i, ch)
-	}
-	for i := 0; i < 1; i++ {
-		fmt.Println(<-ch)
-	}
-	defer close(ch)
-}
-
-func clients(index int, ch chan int) {
-	// Set up a connection to the server.
 	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
 	defer conn.Close()
 	c := pb.NewStreamServiceClient(conn)
-
 	stream, err := c.Service1(context.Background())
 	if err != nil {
-		log.Fatalf("err1", err)
+		fmt.Println("err1")
 	}
-	i := 0
+	var n = 0
 	for {
-		input := bufio.NewReader(os.Stdin)
-		inputstring, _, _ := input.ReadLine()
-		err := stream.Send(&pb.StreamRequest{Name: "request" + strconv.Itoa(i) + string(inputstring)})
-		// time.Sleep(time.Second * 3)
+		n++
+		err = stream.Send(&pb.StreamRequest{
+			Id:         "0101",
+			Info:       "request" + strconv.Itoa(n),
+			ClientType: 1,
+		})
 		if err != nil {
-			log.Fatalf("err2", err)
+			fmt.Println("err2")
 		}
-		i++
+
+		resp, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			fmt.Println("err3")
+		}
+
+		log.Printf("resp: pj.info: %s", resp.Info)
 	}
 
-	resp, err := stream.CloseAndRecv()
-	if err != nil {
-		log.Fatalf("err3", err)
-	}
-	ch <- 1
-	log.Printf("resp: pj.name: %s", resp.Name)
+	stream.CloseSend()
+
 }
+
+// func main() {
+// 	ch := make(chan int, 10)
+// 	for i := 0; i < 1; i++ {
+// 		go clients(i, ch)
+// 	}
+// 	for i := 0; i < 1; i++ {
+// 		fmt.Println(<-ch)
+// 	}
+// 	defer close(ch)
+// }
+
+// func clients(index int, ch chan int) {
+// 	// Set up a connection to the server.
+// 	conn, err := grpc.Dial(address, grpc.WithInsecure())
+// 	if err != nil {
+// 		log.Fatalf("did not connect: %v", err)
+// 	}
+// 	defer conn.Close()
+// 	c := pb.NewStreamServiceClient(conn)
+
+// 	stream, err := c.Service1(context.Background())
+// 	if err != nil {
+// 		log.Fatalf("err1", err)
+// 	}
+// 	i := 0
+// 	for {
+// 		input := bufio.NewReader(os.Stdin)
+// 		inputstring, _, _ := input.ReadLine()
+// 		err := stream.Send(&pb.StreamRequest{
+// 			Id:         "0101",
+// 			Info:       "request" + strconv.Itoa(i) + string(inputstring),
+// 			ClientType: 1,
+// 		})
+// 		// time.Sleep(time.Second * 3)
+// 		if err != nil {
+// 			log.Fatalf("err2", err)
+// 		}
+// 		i++
+// 	}
+
+// 	resp, err := stream.CloseAndRecv()
+// 	if err != nil {
+// 		log.Fatalf("err3", err)
+// 	}
+// 	ch <- 1
+// 	log.Printf("resp: pj.Info: %s", resp.Info)
+// }

@@ -28,6 +28,7 @@ func main() { //Init servant
 	app := new(TestApp.Hello)                               //New init the A Tars
 	cfg := tars.GetServerConfig()                           //Get Config File Object
 	app.AddServant(imp, cfg.App+"."+cfg.Server+".HelloObj") //Register Servant
+	fmt.Println(cfg.App + "." + cfg.Server + ".HelloObj")
 	fmt.Println("server started:......")
 	tars.Run()
 }

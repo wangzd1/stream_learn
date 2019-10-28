@@ -12,7 +12,7 @@ var comm *tars.Communicator
 
 func main() {
 	comm = tars.NewCommunicator()
-	obj := "TestApp.TestServer.HelloObj@tcp -h 127.0.0.1 -p 20001 -t 60000"
+	obj := "TestApp.HelloServer.HelloObj@tcp -h 127.0.0.1 -p 20011 -t 60000"
 	app := new(TestApp.Hello)
 	comm.StringToProxy(obj, app)
 	var req string = "Hello Wold"

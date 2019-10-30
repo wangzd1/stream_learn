@@ -3,15 +3,23 @@ syntax = "proto3";
 package proto;
 
 service MyService {
-    rpc Service1(stream streamRequest) returns (stream streamResponse) {};
+    rpc RegisterRoom(stream streamRequest) returns (stream streamResponse) {};
+    rpc EnterRoom(stream enterRoomRequest) returns (stream enterRoomResponse) {};
 }
 
 message streamRequest {
   string id = 1;
   string info = 2;
-  int32 client_type=3;
 }
 
 message streamResponse {
+  string info = 1;
+}
+
+message enterRoomRequest{
+  string id = 1;
+  string enter_id = 2;
+}
+message enterRoomResponse{
   string info = 1;
 }

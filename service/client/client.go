@@ -26,18 +26,19 @@ func main() {
 	}
 	defer conn.Close()
 	c := pb.NewStreamServiceClient(conn)
-	stream, err := c.Service1(context.Background())
+	stream, err := c.RegisterRoom(context.Background())
 	if err != nil {
 		fmt.Println("err1")
 	}
 	var n = 0
 	for {
 		n++
+		fmt.Println("send1a", n)
 		err = stream.Send(&pb.StreamRequest{
-			Id:         "0101",
-			Info:       "request" + strconv.Itoa(n),
-			ClientType: 1,
+			Id:   "0101",
+			Info: "request" + strconv.Itoa(n),
 		})
+		fmt.Println("send1d", n)
 		if err != nil {
 			fmt.Println("err2")
 		}
@@ -77,7 +78,7 @@ func main() {
 // 	defer conn.Close()
 // 	c := pb.NewStreamServiceClient(conn)
 
-// 	stream, err := c.Service1(context.Background())
+// 	stream, err := c.RegisterRoom(context.Background())
 // 	if err != nil {
 // 		log.Fatalf("err1", err)
 // 	}

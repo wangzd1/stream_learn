@@ -12,6 +12,8 @@ import (
 	"google.golang.org/grpc"
 
 	pb "stream_learn/service/proto"
+
+	"github.com/pkg/profile"
 )
 
 type StreamServer struct{}
@@ -33,31 +35,14 @@ type Audience struct {
 
 var a Rm
 
-func CheckJoin(secondId string) (int, error) {
-	for k, v := range a.Audiences {
-		if v.SecondId == secondId {
-			return k, nil
-		}
-	}
-	return -1, nil
-}
-
-func (audience *Audience) Join() {
-
-}
-
-func (audience *Audience) Leave() {
-
-}
-
-func (s *StreamServer) Service1(stream pb.StreamService_RecordServer) error {
+func (s *StreamServer) RegisterRoom(stream pb.StreamService_RecordServer) error {
 	n := 0
 	fmt.Println(a)
 	for {
-
 		time.Sleep(time.Second)
-
+		fmt.Println("a.Recvqqq")
 		r, err := stream.Recv()
+		fmt.Println("a.Recvwww")
 		if err == io.EOF {
 			return nil
 		}
@@ -65,35 +50,73 @@ func (s *StreamServer) Service1(stream pb.StreamService_RecordServer) error {
 			return err
 		}
 		n++
-		if r.ClientType == 1 {
-			a.Id = r.Id
-			a.Origin <- r.Info
+		a.Id = r.Id
+		// a.Origin <- r.Info
+		if len(a.Audiences) > 0 {
+			// fmt.Println("]]]]]]]]", cap(a.Audiences[0].Origin))
+			// fmt.Println("a.Audiences", a.Audiences)
+			// a.Audiences[0].Origin <- "hahahah"
+			for _, v := range a.Audiences {
+				// fmt.Println("v.Origin", &v.Origin, r.Info)
+				v.Origin <- r.Info
+				// fmt.Println(22)
+			}
 			err = stream.Send(&pb.StreamResponse{
-				Info: "server responce " + r.Info,
+				Info: "some receive,server responce " + r.Info,
 			})
 			if err != nil {
 				return err
 			}
-			log.Printf("stream.send1 pt.info: %s", r.Info)
 		} else {
-			if r.Id == a.Id {
-				// index,err:=CheckJoin(r.Id)
-				err = stream.Send(&pb.StreamResponse{
-					Info: <-a.Origin,
-				})
-				if err != nil {
-					return err
-				}
-				log.Printf("stream.send2 info: %s", r.Info)
+			err = stream.Send(&pb.StreamResponse{
+				Info: "no one receive,server responce " + r.Info,
+			})
+			if err != nil {
+				return err
 			}
 		}
-
+		log.Printf("stream.send1 pt.info: %s", r.Info)
 	}
-
+	fmt.Println("regist exit")
+	return nil
+}
+func (s *StreamServer) EnterRoom(stream pb.StreamService_RecordServer) error {
+	n := 0
+	fmt.Println(a)
+	curchan := make(chan string, 10)
+	time.Sleep(time.Second)
+	r, err := stream.Recv2()
+	if err == io.EOF {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	if a.Id == r.EnterId {
+		a.Audiences = append(a.Audiences, Audience{
+			SecondId: r.Id,
+			Origin:   curchan,
+		})
+	}
+	fmt.Println("curchan", &curchan)
+	for {
+		n++
+		// aaa := <-curchan
+		// fmt.Println("<-curchan", aaa)
+		err = stream.Send2(&pb.EnterRoomResponse{
+			Info: "server responce " + <-curchan,
+		})
+		if err != nil {
+			return err
+		}
+		log.Printf("stream.send2 pt.Id: %s", r.Id)
+	}
+	fmt.Println("enter exit")
 	return nil
 }
 
 func main() {
+	defer profile.Start().Stop()
 	a.Origin = make(chan string, 10)
 	server := grpc.NewServer()
 	pb.RegisterStreamServiceServer(server, &StreamServer{})

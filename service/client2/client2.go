@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"strconv"
 
 	// "time"
 
@@ -26,22 +25,21 @@ func main() {
 	}
 	defer conn.Close()
 	c := pb.NewStreamServiceClient(conn)
-	stream, err := c.Service1(context.Background())
+	stream, err := c.EnterRoom(context.Background())
 	if err != nil {
 		fmt.Println("err1")
 	}
-	var n = 0
+	err = stream.Send2(&pb.EnterRoomRequest{
+		Id:      "a0101",
+		EnterId: "0101",
+	})
+	if err != nil {
+		fmt.Println("err2")
+	}
 	for {
-		err = stream.Send(&pb.StreamRequest{
-			Id:         "a0101",
-			Info:       "request" + strconv.Itoa(n),
-			ClientType: 2,
-		})
-		if err != nil {
-			fmt.Println("err2")
-		}
-
-		resp, err := stream.Recv()
+		fmt.Println("recv2", "``````aa")
+		resp, err := stream.Recv2()
+		fmt.Println("recv2", "```fff``aa")
 		if err == io.EOF {
 			break
 		}

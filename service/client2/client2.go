@@ -37,9 +37,7 @@ func main() {
 		fmt.Println("err2")
 	}
 	for {
-		fmt.Println("recv2", "``````aa")
 		resp, err := stream.Recv2()
-		fmt.Println("recv2", "```fff``aa")
 		if err == io.EOF {
 			break
 		}

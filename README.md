@@ -8,3 +8,5 @@ pprof 文件分析：
 go tool pprof -svg cpu.pprof > cpu.svg
 依赖于 graphviz 工具
 
+go打印结构体
+fmt.Printf("%+v",struct)

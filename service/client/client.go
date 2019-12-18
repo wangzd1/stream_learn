@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"io"
 	"log"
+	"os"
 	"strconv"
 
 	// "time"
@@ -34,9 +36,13 @@ func main() {
 	for {
 		n++
 		fmt.Println("send1a", n)
+		//读键盘
+		reader := bufio.NewReader(os.Stdin)
+		//以换行符结束
+		str, _ := reader.ReadString('\n')
 		err = stream.Send(&pb.StreamRequest{
 			Id:   "0101",
-			Info: "request" + strconv.Itoa(n),
+			Info: "request" + strconv.Itoa(n) + "say:" + str,
 		})
 		fmt.Println("send1d", n)
 		if err != nil {

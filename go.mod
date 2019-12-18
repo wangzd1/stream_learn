@@ -10,6 +10,6 @@ require (
 	github.com/golang/protobuf v1.3.2
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/nsqio/go-nsq v1.0.7 // indirect
-	github.com/pkg/profile v1.3.0 // indirect
+	github.com/pkg/profile v1.3.0
 	google.golang.org/grpc v1.24.0
 )

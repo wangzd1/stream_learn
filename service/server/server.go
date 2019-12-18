@@ -51,15 +51,9 @@ func (s *StreamServer) RegisterRoom(stream pb.StreamService_RecordServer) error 
 		}
 		n++
 		a.Id = r.Id
-		// a.Origin <- r.Info
 		if len(a.Audiences) > 0 {
-			// fmt.Println("]]]]]]]]", cap(a.Audiences[0].Origin))
-			// fmt.Println("a.Audiences", a.Audiences)
-			// a.Audiences[0].Origin <- "hahahah"
 			for _, v := range a.Audiences {
-				// fmt.Println("v.Origin", &v.Origin, r.Info)
 				v.Origin <- r.Info
-				// fmt.Println(22)
 			}
 			err = stream.Send(&pb.StreamResponse{
 				Info: "some receive,server responce " + r.Info,
@@ -101,8 +95,6 @@ func (s *StreamServer) EnterRoom(stream pb.StreamService_RecordServer) error {
 	fmt.Println("curchan", &curchan)
 	for {
 		n++
-		// aaa := <-curchan
-		// fmt.Println("<-curchan", aaa)
 		err = stream.Send2(&pb.EnterRoomResponse{
 			Info: "server responce " + <-curchan,
 		})

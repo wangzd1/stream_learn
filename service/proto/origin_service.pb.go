@@ -4,12 +4,10 @@
 package proto
 
 import (
-	"context"
 	fmt "fmt"
 	math "math"
 
 	proto "github.com/golang/protobuf/proto"
-	"google.golang.org/grpc"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -220,143 +218,4 @@ var fileDescriptor_4a78a6e360964aa4 = []byte{
 	0x80, 0x51, 0xc8, 0x85, 0x8b, 0xd3, 0x15, 0x66, 0xb3, 0x90, 0x38, 0x54, 0x25, 0xba, 0x57, 0xa4,
 	0x24, 0x30, 0x25, 0x90, 0x4d, 0x49, 0x62, 0x03, 0x4b, 0x1b, 0x03, 0x02, 0x00, 0x00, 0xff, 0xff,
 	0xb5, 0xff, 0x33, 0x70, 0x7f, 0x01, 0x00, 0x00,
-}
-
-type StreamServiceClient interface {
-	RegisterRoom(ctx context.Context, opts ...grpc.CallOption) (StreamClient, error)
-	EnterRoom(ctx context.Context, opts ...grpc.CallOption) (StreamClient, error)
-}
-
-type streamServiceClient struct {
-	cc *grpc.ClientConn
-}
-
-func NewStreamServiceClient(cc *grpc.ClientConn) StreamServiceClient {
-	return &streamServiceClient{cc}
-}
-
-func (c *streamServiceClient) RegisterRoom(ctx context.Context, opts ...grpc.CallOption) (StreamClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_StreamService_serviceDesc.Streams[0], "/proto.MyService/RegisterRoom", opts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &streamClient{stream}
-	return x, nil
-}
-
-func (c *streamServiceClient) EnterRoom(ctx context.Context, opts ...grpc.CallOption) (StreamClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_StreamService_serviceDesc.Streams[0], "/proto.MyService/EnterRoom", opts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &streamClient{stream}
-	return x, nil
-}
-
-type StreamClient interface {
-	Send(*StreamRequest) error
-	Recv() (*StreamResponse, error)
-	Send2(*EnterRoomRequest) error
-	Recv2() (*EnterRoomResponse, error)
-	grpc.ClientStream
-}
-
-type streamClient struct {
-	grpc.ClientStream
-}
-
-func (x *streamClient) Send(m *StreamRequest) error {
-	return x.ClientStream.SendMsg(m)
-}
-func (x *streamClient) Send2(m *EnterRoomRequest) error {
-	return x.ClientStream.SendMsg(m)
-}
-
-func (x *streamClient) Recv() (*StreamResponse, error) {
-	m := new(StreamResponse)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-func (x *streamClient) Recv2() (*EnterRoomResponse, error) {
-	m := new(EnterRoomResponse)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-func RegisterStreamServiceServer(s *grpc.Server, srv StreamServiceServer) {
-	s.RegisterService(&_StreamService_serviceDesc, srv)
-}
-
-var _StreamService_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "proto.MyService",
-	HandlerType: (*StreamServiceServer)(nil),
-	Methods:     []grpc.MethodDesc{},
-	Streams: []grpc.StreamDesc{
-		{
-			StreamName:    "RegisterRoom",
-			Handler:       _MyService_RegisterRoom_Handler,
-			ClientStreams: true,
-			ServerStreams: true,
-		},
-		{
-			StreamName:    "EnterRoom",
-			Handler:       _MyService_EnterRoom_Handler,
-			ClientStreams: true,
-			ServerStreams: true,
-		},
-	},
-	Metadata: "origin_service.proto",
-}
-
-func _MyService_RegisterRoom_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(StreamServiceServer).RegisterRoom(&streamServiceRecordServer{stream})
-}
-
-func _MyService_EnterRoom_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(StreamServiceServer).EnterRoom(&streamServiceRecordServer{stream})
-}
-
-type StreamServiceServer interface {
-	RegisterRoom(StreamService_RecordServer) error
-	EnterRoom(StreamService_RecordServer) error
-}
-
-type StreamService_RecordServer interface {
-	Recv() (*StreamRequest, error)
-	Send(*StreamResponse) error
-	Recv2() (*EnterRoomRequest, error)
-	Send2(*EnterRoomResponse) error
-	grpc.ServerStream
-}
-
-type streamServiceRecordServer struct {
-	grpc.ServerStream
-}
-
-func (x *streamServiceRecordServer) Send(m *StreamResponse) error {
-	return x.ServerStream.SendMsg(m)
-}
-
-func (x *streamServiceRecordServer) Send2(m *EnterRoomResponse) error {
-	return x.ServerStream.SendMsg(m)
-}
-
-func (x *streamServiceRecordServer) Recv() (*StreamRequest, error) {
-	m := new(StreamRequest)
-	if err := x.ServerStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-func (x *streamServiceRecordServer) Recv2() (*EnterRoomRequest, error) {
-	m := new(EnterRoomRequest)
-	if err := x.ServerStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
 }
